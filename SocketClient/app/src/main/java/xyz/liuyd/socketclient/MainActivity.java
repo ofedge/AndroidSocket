@@ -31,9 +31,6 @@ import xyz.liuyd.socketclient.SocketClientContrat.ClientEntry;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String HOST = "181.215.245.97";
-    private static final int PORT = 9999;
-
     private Button mConnectBtn;
     private Button mDisconnectBtn;
     private TextView mTextView;
@@ -52,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
 
+    private String host;
+    private int port;
     private String clientId;
     private String phoneNumber;
     private String smsContent;
@@ -93,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
                         settingFlag = false;
                     } else {
                         settingFlag = true;
+                        host = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_HOST));
+                        port = cursor.getInt(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_PORT));
                         clientId = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_CLIENT_ID));
                         smsContent = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_CONTENT));
                         smsLimit = cursor.getInt(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_LIMIT));
@@ -116,12 +117,12 @@ public class MainActivity extends AppCompatActivity {
                     handler.sendEmptyMessage(1);
                 } else if (!connFlag){
                     threadFlag = true;
-                    mTextView.setText("连接中...");
+                    mTextView.setText("连接中...服务器: " + host + ", 端口: " + port);
                     new Thread(new Runnable(){
                         @Override
                         public void run() {
                             try {
-                                socket = new Socket(HOST, PORT);
+                                socket = new Socket(host, port);
                                 connFlag = true;
                                 socketMsg = "连接成功, 今日已发送: " + smsSend + "条, 上限: " + smsLimit + "条";
                                 handler.sendEmptyMessage(1);
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                                             socketMsg = "到" + targetNumber + "的短信发送失败: " + e.getMessage();
                                             handler.sendEmptyMessage(1);
                                         }
+                                        Thread.sleep(1000);
                                     }
                                 }
                             } catch (IOException e) {
@@ -181,9 +183,9 @@ public class MainActivity extends AppCompatActivity {
         mDisconnectBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                closeConnection();
                 socketMsg = "断开连接";
                 handler.sendEmptyMessage(1);
-                closeConnection();
             }
         });
     }
@@ -258,6 +260,15 @@ public class MainActivity extends AppCompatActivity {
             }
             Intent intent = new Intent();
             intent.setClass(this, SettingActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.server_setting){
+            if (connFlag) {
+                Toast.makeText(getApplicationContext(), "你必须断开连接才能进入设置", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            Intent intent = new Intent();
+            intent.setClass(this, ServerActivity.class);
             startActivity(intent);
             return true;
         }

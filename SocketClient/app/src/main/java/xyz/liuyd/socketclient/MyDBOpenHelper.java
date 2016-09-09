@@ -15,7 +15,7 @@ import xyz.liuyd.socketclient.SocketClientContrat.ClientEntry;
  */
 public class MyDBOpenHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "client.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -23,6 +23,8 @@ public class MyDBOpenHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_CLIENT =
             "CREATE TABLE " + ClientEntry.TABLE_NAME + "(" +
                     ClientEntry.COLUMN_NAME_CLIENT_ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
+                    ClientEntry.COLUMN_NAME_HOST + TEXT_TYPE + COMMA_SEP +
+                    ClientEntry.COLUMN_NAME_PORT + TEXT_TYPE + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_PHONE_NUMBER + TEXT_TYPE + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_SMS_CONTENT + TEXT_TYPE + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_SMS_LIMIT + TEXT_TYPE + COMMA_SEP +
@@ -40,6 +42,8 @@ public class MyDBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_CLIENT);
         ContentValues values = new ContentValues();
         values.put(ClientEntry.COLUMN_NAME_CLIENT_ID, 1);
+        values.put(ClientEntry.COLUMN_NAME_HOST, "181.215.245.97");
+        values.put(ClientEntry.COLUMN_NAME_PORT, 9999);
         values.put(ClientEntry.COLUMN_NAME_PHONE_NUMBER, "");
         values.put(ClientEntry.COLUMN_NAME_SMS_CONTENT, "");
         values.put(ClientEntry.COLUMN_NAME_SMS_LIMIT, 50);

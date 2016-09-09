@@ -47,7 +47,7 @@ public class SettingActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        getSupportActionBar().setTitle("Setting");
+        getSupportActionBar().setTitle("一般设置");
 
         Cursor cursor = db.query(ClientEntry.TABLE_NAME, null, null, null, null, null, null);
         if (cursor.moveToFirst()){

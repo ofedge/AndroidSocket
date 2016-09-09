@@ -6,4 +6,8 @@
         android:title="@string/action_settings"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/server_setting"
+        android:title="@string/server_setting"
+        app:showAsAction="never"/>
+
 </menu>

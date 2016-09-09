@@ -3,7 +3,9 @@
     <string name="connect_socket">连接</string>
     <string name="disconnect_socket">断开</string>
     <string name="socket_info">等待连接...</string>
-    <string name="action_settings">设置</string>
+
+    <string name="action_settings">一般设置</string>
+    <string name="server_setting">服务器设置</string>
 
     <string name="title_activity_setting">SettingActivity</string>
     <string name="phone_number">输入您的分机号码</string>
@@ -11,4 +13,8 @@
     <string name="sms_limit">每日发送短信上限</string>
     <string name="sms_send">今日已发送短信: 0</string>
     <string name="save_setting">保存</string>
+
+    <string name="socket_host">服务器</string>
+    <string name="socket_port">端口</string>
+    <string name="server_tips">1.服务器和端口都必须填写 \n2.服务器不需要加http:// </string>'
 </resources>

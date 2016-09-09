@@ -12,6 +12,8 @@ public final class SocketClientContrat {
     public static abstract class ClientEntry implements BaseColumns {
         public static final String TABLE_NAME = "clientinfo";
         public static final String COLUMN_NAME_CLIENT_ID = "id";
+        public static final String COLUMN_NAME_HOST = "host";
+        public static final String COLUMN_NAME_PORT = "port";
         public static final String COLUMN_NAME_PHONE_NUMBER = "phonenumber";
         public static final String COLUMN_NAME_SMS_CONTENT = "smsContent";
         public static final String COLUMN_NAME_SMS_LIMIT = "smslimit";
