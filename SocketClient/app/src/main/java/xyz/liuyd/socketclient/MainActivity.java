@@ -31,6 +31,9 @@ import xyz.liuyd.socketclient.SocketClientContrat.ClientEntry;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String HOST = "181.215.245.97";
+    private static final int PORT = 9999;
+
     private Button mConnectBtn;
     private Button mDisconnectBtn;
     private TextView mTextView;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String clientId;
     private String phoneNumber;
+    private String smsContent;
     private int smsLimit;
     private int smsSend;
 
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         settingFlag = true;
                         clientId = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_CLIENT_ID));
+                        smsContent = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_CONTENT));
                         smsLimit = cursor.getInt(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_LIMIT));
                         String date = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_DATE));
                         if (!new SimpleDateFormat("yyyyMMdd").format(new Date()).equals(date)){ // if the statistic data is not today, reset it!
@@ -104,21 +109,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 if (!settingFlag) {
-                    socketMsg = "Your phone number is required to continue";
+                    socketMsg = "需要设置你的分机号码才能继续操作";
                     handler.sendEmptyMessage(1);
                 } else if (smsSend >= smsLimit) {
-                    socketMsg = "Your SMS send reached your SMS limit!";
+                    socketMsg = "今日发送短信数量已达设置上限!";
                     handler.sendEmptyMessage(1);
                 } else if (!connFlag){
                     threadFlag = true;
-                    mTextView.setText("Connecting...");
+                    mTextView.setText("连接中...");
                     new Thread(new Runnable(){
                         @Override
                         public void run() {
                             try {
-                                socket = new Socket("104.128.233.118", 9999);
+                                socket = new Socket(HOST, PORT);
                                 connFlag = true;
-                                socketMsg = "Connection build! SMS send: " + smsSend + ", SMS limit: " + smsLimit;
+                                socketMsg = "连接成功, 今日已发送: " + smsSend + "条, 上限: " + smsLimit + "条";
                                 handler.sendEmptyMessage(1);
                                 is = socket.getInputStream();
                                 os = socket.getOutputStream();
@@ -138,32 +143,33 @@ public class MainActivity extends AppCompatActivity {
                                         handler.sendEmptyMessage(1);
                                         try{
                                             SmsManager smsManager = SmsManager.getDefault();
-                                            smsManager.sendTextMessage(targetNumber, null, "msg send from app", null, null);
+                                            smsManager.sendTextMessage(targetNumber, null, smsContent, null, null);
                                             smsSend++;
                                             ContentValues values = new ContentValues();
                                             values.put(ClientEntry.COLUMN_NAME_SMS_SEND, smsSend);
                                             db.update(ClientEntry.TABLE_NAME, values, ClientEntry.COLUMN_NAME_CLIENT_ID + " = ?", new String[]{clientId});
+                                            socketMsg = "到 " + targetNumber + "的短信发送成功, 今日已发送" + smsSend + "条, 上限" + smsLimit + "条";
                                             if (smsSend >= smsLimit){
-                                                socketMsg = "Your SMS send reach your SMS limit, connection closed";
-                                                handler.sendEmptyMessage(1);
+                                                socketMsg = socketMsg + "\n已达今日发送上限, 关闭连接";
+                                            }
+                                            handler.sendEmptyMessage(1);
+                                            if (smsSend >= smsLimit){
                                                 closeConnection();
                                             }
-                                            socketMsg = "Send message to " + targetNumber + " successfully!, SMS send: " + smsSend + ", SMS limit: " + smsLimit;
-                                            handler.sendEmptyMessage(1);
                                         } catch (Exception e){
                                             Log.e("MainActivity", e.getMessage());
-                                            socketMsg = "Error sending message to " + targetNumber + ", reason: " + e.getMessage();
+                                            socketMsg = "到" + targetNumber + "的短信发送失败: " + e.getMessage();
                                             handler.sendEmptyMessage(1);
                                         }
                                     }
                                 }
                             } catch (IOException e) {
                                 Log.e("MainActivity", e.getMessage());
-                                socketMsg = "Connection error: " + e.getMessage();
+                                socketMsg = "连接异常: " + e.getMessage();
                                 handler.sendEmptyMessage(1);
                             } catch (Exception e){
                                 Log.e("MainActivity", e.getMessage());
-                                socketMsg = "Connection error: " + e.getMessage();
+                                socketMsg = "发生异常: " + e.getMessage();
                                 handler.sendEmptyMessage(1);
                             }
                         }
@@ -175,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
         mDisconnectBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                socketMsg = "断开连接";
+                handler.sendEmptyMessage(1);
                 closeConnection();
             }
         });
@@ -199,15 +207,13 @@ public class MainActivity extends AppCompatActivity {
                 is.close();
             }
             connFlag = false;
-            socketMsg = "Connection closed!";
-            handler.sendEmptyMessage(1);
         } catch (IOException e) {
             Log.e("MainActivity", e.getMessage());
-            socketMsg = "Close error: " + e.getMessage();
+            socketMsg = "断开异常: " + e.getMessage();
             handler.sendEmptyMessage(1);
         } catch (Exception e){
             Log.e("MainActivity", e.getMessage());
-            socketMsg = "Close error: " + e.getMessage();
+            socketMsg = "断开异常: " + e.getMessage();
             handler.sendEmptyMessage(1);
         }
     }
@@ -247,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings){
             if (connFlag) {
-                Toast.makeText(getApplicationContext(), "You must disconnect before enter setting.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "你必须断开连接才能进入设置", Toast.LENGTH_SHORT).show();
                 return false;
             }
             Intent intent = new Intent();

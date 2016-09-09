@@ -25,6 +25,7 @@ public class SettingActivity extends AppCompatActivity {
     private String clientId;
 
     private EditText mPhoneNumber;
+    private EditText mSmsContent;
     private EditText mSmsLimit;
     private TextView mSmsSend;
     private Button mSaveButton;
@@ -35,6 +36,7 @@ public class SettingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
 
         mPhoneNumber = (EditText) findViewById(R.id.phoneNumberText);
+        mSmsContent = (EditText) findViewById(R.id.smsContentText);
         mSmsLimit = (EditText) findViewById(R.id.smsLimitText);
         mSmsSend = (TextView) findViewById(R.id.smsSend);
         mSaveButton = (Button) findViewById(R.id.saveSetting);
@@ -54,12 +56,16 @@ public class SettingActivity extends AppCompatActivity {
             if (!TextUtils.isEmpty(phoneNumber)){
                 mPhoneNumber.setText(phoneNumber);
             }
+            String smsContent = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_CONTENT));
+            if (!TextUtils.isEmpty(smsContent)) {
+                mSmsContent.setText(smsContent);
+            }
             String smsLimit = cursor.getString(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_LIMIT));
             if (!TextUtils.isEmpty(smsLimit)){
                 mSmsLimit.setText(smsLimit);
             }
             int smsSend = cursor.getInt(cursor.getColumnIndex(ClientEntry.COLUMN_NAME_SMS_SEND));
-            mSmsSend.setText("SMS send today: " + smsSend);
+            mSmsSend.setText("今日已发送短信: " + smsSend);
         }
 
         mSaveButton.setOnClickListener(new View.OnClickListener() {
@@ -67,16 +73,20 @@ public class SettingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String phoneNumber = mPhoneNumber.getText().toString();
                 String smsLimit = mSmsLimit.getText().toString();
+                String smsContent = mSmsContent.getText().toString();
                 if (TextUtils.isEmpty(phoneNumber)){
-                    Toast.makeText(getApplicationContext(), "Phone number in required!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "分机号码必须填写!", Toast.LENGTH_LONG).show();
+                } else if (TextUtils.isEmpty(smsContent)) {
+                    Toast.makeText(getApplicationContext(), "短信内容必须填写!", Toast.LENGTH_LONG).show();
                 } else if (TextUtils.isEmpty(smsLimit)){
-                    Toast.makeText(getApplicationContext(), "SMS limit is required", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "每日短信上限必须填写", Toast.LENGTH_LONG).show();
                 }else {
                     ContentValues values = new ContentValues();
                     values.put(ClientEntry.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
+                    values.put(ClientEntry.COLUMN_NAME_SMS_CONTENT, smsContent);
                     values.put(ClientEntry.COLUMN_NAME_SMS_LIMIT, smsLimit);
                     db.update(ClientEntry.TABLE_NAME, values, ClientEntry.COLUMN_NAME_CLIENT_ID + " = ?", new String[]{clientId});
-                    Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "保存成功!", Toast.LENGTH_LONG).show();
                 }
             }
         });

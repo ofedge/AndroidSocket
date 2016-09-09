@@ -24,6 +24,7 @@ public class MyDBOpenHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + ClientEntry.TABLE_NAME + "(" +
                     ClientEntry.COLUMN_NAME_CLIENT_ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_PHONE_NUMBER + TEXT_TYPE + COMMA_SEP +
+                    ClientEntry.COLUMN_NAME_SMS_CONTENT + TEXT_TYPE + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_SMS_LIMIT + TEXT_TYPE + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_DATE + TEXT_TYPE + COMMA_SEP +
                     ClientEntry.COLUMN_NAME_SMS_SEND + TEXT_TYPE + ")";
@@ -40,6 +41,7 @@ public class MyDBOpenHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(ClientEntry.COLUMN_NAME_CLIENT_ID, 1);
         values.put(ClientEntry.COLUMN_NAME_PHONE_NUMBER, "");
+        values.put(ClientEntry.COLUMN_NAME_SMS_CONTENT, "");
         values.put(ClientEntry.COLUMN_NAME_SMS_LIMIT, 50);
         values.put(ClientEntry.COLUMN_NAME_DATE, new SimpleDateFormat("yyyyMMdd").format(new Date()));
         values.put(ClientEntry.COLUMN_NAME_SMS_SEND, 0);
